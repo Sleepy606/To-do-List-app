@@ -6,7 +6,6 @@ const filterButtons = document.querySelectorAll(".filter-btn");
 
 let tasks = [];
 let currentFilter = "all";
-let newTaskId = null;
 
 function addTask(event){
     
@@ -21,7 +20,6 @@ function addTask(event){
 	errorMsg.textContent = "";
 	const task = { id: Date.now(), text: text, done: false };
 	tasks.push(task);
-	newTaskId = task.id;
 	inputBox.value = "";
 	saveData();
 	render();
