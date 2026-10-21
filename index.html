@@ -5,22 +5,28 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title> To-Do List App </title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://gstatic.com" crossorigin>
-	<link rel="https://googleapis.com" rel="stylesheet">
-	<link rel="stylesheet" href=" style.css">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="container">
    <div class="todo-app">
-	<h2>To-Do List <img src="icons.png"></h2>
-	<div class="row">
-	   <input type="text" id="input-box" placeholder="Add your text">
-	   <button onclick="addTask()">Add</button>
+	<h2>To-Do List <img src="icons.png" alt="" width="30" height="30"></h2>
+	<form class="row" onsubmit="addTask(event)">
+	   <label for="input-box" class="sr-only">New task</label>
+	   <input type="text" id="input-box" placeholder="Add your task">
+	   <button type="submit" class="btn-primary">Add</button>
+	</form>
+	<p id="error" class="error" role="alert"></p>
+	<div class="filters">
+	   <button type="button" class="filter-btn active" data-filter="all">All</button>
+	   <button type="button" class="filter-btn" data-filter="active">Active</button>
+	   <button type="button" class="filter-btn" data-filter="done">Done</button>
 	</div>
-	<ul id="list-container">
-	   <!-- <li class="checked">Task 1</li>
-	   <li>Task 2</li>
-	   <li>Task 3</li> -->
+
+	<ul id="list-container"></ul>
+	
+	<p id="counter" class="counter" aria-live="polite"></p>
    </div>
 </div>
 <script src="script.js"></script> 
