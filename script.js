@@ -1,37 +1,101 @@
 const inputBox =  document.getElementById("input-box");
 const listContainer = document.getElementById("list-container");
+const errorMsg = document.getElementById("error");
+const counter = document.getElementById("counter");
+const filterButtons = document.querySelectorAll(".filter-btn");
 
-function addTask(){
-    if(inputBox.value === ''){
-	alert("You must write something!");
+let tasks = [];
+let currentFilter = "all";
+let newTaskId = null;
+
+function addTask(event){
+    
+    event.preventDefault();
+
+    const text = inputBox.value.trim();
+
+    if(text === ''){
+	errorMsg.textContent = "You must write something!";
     }
     else{
-	let li = document.createElement("li");
-	li.innerHTML = inputBox.value;
-	listContainer.appendChild(li);
-	let span = document.createElement("span");
-	span.innerHTML = "\u00d7";
-	li.appendChild(span);
+	errorMsg.textContent = "";
+	const task = { id: Date.now(), text: text, done: false };
+	tasks.push(task);
+	newTaskId = task.id;
+	inputBox.value = "";
+	saveData();
+	render();
     }
-    inputBox.value = "";
-    saveData();
 }
 
 listContainer.addEventListener("click", function(e){
-    if(e.target.tagName === "LI"){
-	e.target.classList.toggle("checked");
-	saveData();
+    const li = e.target.closest("li");
+    if(!li) return;
+    const id = Number(li.dataset.id);
+
+    if(e.target.tagName === "SPAN"){
+	tasks = tasks.filter(function(t){ return t.id !== id; });
     }
-    else if(e.target.tagName === "SPAN"){
-	e.target.parentElement.remove();
-	saveData();
+    else{
+	const task = tasks.find(function(t){ return t.id === id; });
+	task.done = !task.done;
     }
+	saveData();
+	render();
 },false);
 
-function saveData(){
-    localStorage.setItem("data", listContainer.innerHTML);
+filterButtons.forEach(function(btn){
+   btn.addEventListener("click", function(){
+	currentFilter = btn.dataset.filter;
+	filterButtons.forEach(function(b){
+	   b.classList.toggle("active", b === btn);
+	});
+	render();
+   });
+});
+
+function render(){
+    listContainer.innerHTML = "";
+
+    tasks
+        .filter(function(t){
+	    if(currentFilter === "active") return !t.done;
+	    if(currentFilter === "done") return t.done;
+	    return true;
+	})
+	.forEach(function(task){
+	    let li = document.createElement("li");
+	    li.textContent = task.text;
+	    li.dataset.id = task.id;
+	    if(task.done) li.classList.add("checked");
+	    
+
+	    let span = document.createElement("span");
+	    span.textContent = "×";
+	    span.setAttribute("aria-label", "Delete task");
+	    li.appendChild(span);
+
+	    listContainer.appendChild(li);
+	});
+
+    const left = tasks.filter(function(t){ return !t.done; }).length;
+    counter.textContent = tasks.length === 0
+	? "Nothing to do 🎉"
+	: left + (left === 1 ? " task left" : " tasks left");
 }
+	
+function saveData(){
+  try{
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }catch(err){}
+}   
 function showTask(){
-    listContainer.innerHTML = localStorage.getItem("data");
+    try{
+        const saved = JSON.parse(localStorage.getItem("tasks"));
+	tasks = Array.isArray(saved) ? saved : [];
+    }catch(err){
+       tasks = [];
+    }
+    render();
 }
 showTask();
